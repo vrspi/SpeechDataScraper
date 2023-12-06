@@ -64,7 +64,7 @@ header h1 {
                                     <img src="/css/titredepartdestination.png" alt="" />
                                 </div>
                                 <div class="info-text">                                    
-                                    <span class="info-data" id="line">"Example text for voice recording."</span>
+                                    <span class="info-data" id="line"><%= randomText %></span>
                                 </div>
                             </div>
                             
@@ -137,12 +137,16 @@ header h1 {
             mediaRecorder.ondataavailable = event => {
                 audioChunks.push(event.data);
             };
-            mediaRecorder.onstop = () => {
+            mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks);
                 const audioUrl = URL.createObjectURL(audioBlob);
-                createAudioPlayer(audioUrl);
-                createAlert('Recording finished successfully!', 'success');                
+                // createAudioPlayer(audioUrl);
+
+                createAlert('Recording finished successfully!', 'success');    
+
                 audioChunks = [];
+                await sendAudioToServer(audioBlob);
+
             };
         }).catch(error => {
             createAlert('Error accessing microphone: ' + error.message, 'danger'); // Error alert
@@ -160,6 +164,24 @@ header h1 {
             audioChunks = [];
         }
     });
+    async function sendAudioToServer(audioBlob) {
+        try {
+            const formData = new FormData();
+            formData.append('audio', audioBlob);
+
+            const response = await fetch('/submit-audio', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.randomText) {
+                document.getElementById('line').innerText = data.randomText;
+            }
+        } catch (error) {
+            console.error('Error sending audio:', error);
+        }
+    }
 
     function createAlert(message, type) {
         const alert = document.createElement('div');

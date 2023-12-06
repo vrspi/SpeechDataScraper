@@ -1,4 +1,5 @@
 // app.js
+const db = require('./module/db');
 
 const express = require('express');
 const path = require('path');
@@ -14,6 +15,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Import routes
 const voiceRecorderRoutes = require('./routes/voiceRecorderRoutes');
+
+app.post('/submit-audio', async (req, res) => {
+    try {
+       
+        const [rows] = await db.query("SELECT text FROM `1`");
+        const randomText = rows[Math.floor(Math.random() * rows.length)].text;
+
+        // Respond with the new text
+        res.json({ randomText: randomText });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 // Use routes
 app.use('/VoiceRecorder', voiceRecorderRoutes);
