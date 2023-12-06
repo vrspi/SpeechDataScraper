@@ -34,16 +34,26 @@ header h1 {
     margin: 0; 
     
 }
-#alerts-container .alert {
-    max-width: 60%; /* Adjust this value as needed */
-    margin-left: auto;
-    margin-right: auto;
+#alerts-container {
+    position: fixed;
+    bottom: 100px; /* Adjust this value based on the height of your footer */
+    left: 0;
+    right: 0;
+    z-index: 1050; /* High z-index to ensure it's above other elements */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    margin-top: 20px; /* Add some space above the alert */
 }
+
+#alerts-container .alert {
+    max-width: 60%; /* Adjust this value as needed */
+    margin-top: 20px; /* Add some space above the alert */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 
             </style>
         </head>
@@ -114,57 +124,50 @@ header h1 {
             
             <script>
               document.addEventListener('DOMContentLoaded', () => {
-    let mediaRecorder;
+                let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
 
     const recordToggle = document.getElementById('record-toggle');
     const recordingVisuals = document.querySelector('.recording');
-    const alertsContainer = document.getElementById('alerts-container'); // Container for alerts
-    function createAudioPlayer(audioUrl) {
-    const playerContainer = document.getElementById('audio-player-container');
-    // Clear previous audio player if exists
-    playerContainer.innerHTML = '';
-
-    const audioPlayer = document.createElement('audio');
-    audioPlayer.controls = true;
-    audioPlayer.src = audioUrl;
-
-    playerContainer.appendChild(audioPlayer);
-    }
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = event => {
-                audioChunks.push(event.data);
-            };
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks);
-                const audioUrl = URL.createObjectURL(audioBlob);
-                // createAudioPlayer(audioUrl);
-
-                createAlert('Recording finished successfully!', 'success');    
-
-                audioChunks = [];
-                await sendAudioToServer(audioBlob);
-
-            };
-        }).catch(error => {
-            createAlert('Error accessing microphone: ' + error.message, 'danger'); // Error alert
-        });
-
-    recordToggle.addEventListener('change', () => {
+    const alertsContainer = document.getElementById('alerts-container');
+    let stream;
+    recordToggle.addEventListener('change', async () => {
         if (!isRecording) {
-            mediaRecorder.start();
-            isRecording = true;
-            recordingVisuals.style.opacity = 1;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks);
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    // createAudioPlayer(audioUrl);
+                    createAlert('Recording finished successfully!', 'success');
+                    audioChunks = [];
+                    await sendAudioToServer(audioBlob);
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                recordingVisuals.style.opacity = 1;
+            } catch (error) {
+                createAlert('Error accessing microphone: ' + error.message, 'danger');
+            }
         } else {
             mediaRecorder.stop();
-            isRecording = false;
-            recordingVisuals.style.opacity = 0;
-            audioChunks = [];
+        mediaRecorder = null;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop()); // Stop each track of the stream
+        }
+        stream = null;
+        isRecording = false;
+        recordingVisuals.style.opacity = 0;
+        audioChunks = [];
         }
     });
+
+    
     async function sendAudioToServer(audioBlob) {
         try {
             const formData = new FormData();
