@@ -1,52 +1,186 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Recorder</title>
-<link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-<div class="container">
-    <header>
-        <h1>AI Voice Recorder</h1>
-    </header>
-    <main>
-        <div id="instructions">
-            <p>Please read the following text aloud:</p>
-            <blockquote>
-                <!-- Dynamic text to read will go here -->
-                "Example text for voice recording."
-            </blockquote>
-        </div>
-        <div id="recorder">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AI Voice Recorder</title>
+            <link rel="stylesheet" href="/css/styles.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+            <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+            <style>
+                 footer {
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-logo {
+    height: 50px;
+    margin-right: 20px; 
+}
+
+header h1 {
+    margin: 0; 
+    
+}
+#alerts-container .alert {
+    max-width: 60%; /* Adjust this value as needed */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px; /* Add some space above the alert */
+}
+
+            </style>
+        </head>
+        <body>
+            <header>
+                <img src="/css/aiv.png" alt="Logo" class="header-logo">
+                <h1>AI Voice Recorder</h1>
+            </header>
             
-                <input type="checkbox" name="toggle" id="record-toggle">
-                
-                <svg viewBox="0 0 100 100">
-                    <circle cx="50%" cy="50%" r="45" class="circle-svg" />
-                </svg>
-                
-                <div class="mic">
-                    <div class="mic__head"></div>
-                    <div class="mic__neck"></div>
-                    <div class="mic__leg"></div>
+            <main class="container-parent">
+                <div id="alerts-container"></div>
+                <div class="container">
+                    <div id="instructions">
+                        <p>Please read the following text aloud:</p>
+                        <blockquote style="display: flex; justify-content: center ; align-items: center;">
+                            <!-- Dynamic text to read will go here -->
+                            <div class="info-block">
+                                <div class="info-background">
+                                    <img src="/css/titredepartdestination.png" alt="" />
+                                </div>
+                                <div class="info-text">                                    
+                                    <span class="info-data" id="line">"Example text for voice recording."</span>
+                                </div>
+                            </div>
+                            
+                        </blockquote>
+                    </div>
+                    <div id="recorder">
+                        <div id="recorder">
+            
+                            <input type="checkbox" name="toggle" id="record-toggle">
+                            
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50%" cy="50%" r="45" class="circle-svg" />
+                            </svg>
+                            
+                            <div class="mic">
+                                <div class="mic__head"></div>
+                                <div class="mic__neck"></div>
+                                <div class="mic__leg"></div>
+                            </div>
+                            
+                            <div class="recording">
+                                <div class="round"></div>
+                                <div class="round"></div>
+                                <div class="round"></div>
+                            </div>
+                            
+                            <label for="record-toggle" class="toggle-label"></label>
+                        
+                     </div>                   
+                    
+    
+                </div>
+                <div id="audio-player-container">
+                    <!-- Audio player will be inserted here -->
                 </div>
                 
-                <div class="recording">
-                    <div class="round"></div>
-                    <div class="round"></div>
-                    <div class="round"></div>
                 </div>
-                
-                <label for="record-toggle" class="toggle-label"></label>
+            </main>
+            <footer>
+                <div class="footer-content">
+                    <p>© 2023 EHEIO Engineering School Voice Data Collection Project</p>
+                    <p>In collaboration with C'est Carré and Majal Berkane</p>
+                    <p><a href="/privacy-policy">Privacy Policy</a></p>
+                </div>
+            </footer>
             
-        </div>
-    </main>
-    <footer>
-        <p>Record your voice for AI training</p>
-    </footer>
-</div>
-<script src="app.js"></script>
-</body>
+            <script>
+              document.addEventListener('DOMContentLoaded', () => {
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const recordToggle = document.getElementById('record-toggle');
+    const recordingVisuals = document.querySelector('.recording');
+    const alertsContainer = document.getElementById('alerts-container'); // Container for alerts
+    function createAudioPlayer(audioUrl) {
+    const playerContainer = document.getElementById('audio-player-container');
+    // Clear previous audio player if exists
+    playerContainer.innerHTML = '';
+
+    const audioPlayer = document.createElement('audio');
+    audioPlayer.controls = true;
+    audioPlayer.src = audioUrl;
+
+    playerContainer.appendChild(audioPlayer);
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks);
+                const audioUrl = URL.createObjectURL(audioBlob);
+                createAudioPlayer(audioUrl);
+                createAlert('Recording finished successfully!', 'success');                
+                audioChunks = [];
+            };
+        }).catch(error => {
+            createAlert('Error accessing microphone: ' + error.message, 'danger'); // Error alert
+        });
+
+    recordToggle.addEventListener('change', () => {
+        if (!isRecording) {
+            mediaRecorder.start();
+            isRecording = true;
+            recordingVisuals.style.opacity = 1;
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            recordingVisuals.style.opacity = 0;
+            audioChunks = [];
+        }
+    });
+
+    function createAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.role = 'alert';
+        alert.innerHTML = `
+            <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        `;
+        alertsContainer.appendChild(alert);
+
+        // Auto-dismiss alert after 5 seconds
+        setTimeout(() => {
+            $(alert).alert('close'); // Using jQuery if Bootstrap requires it
+        }, 5000);
+    }
+});
+
+            </script>
+        </body>
 </html>
+        

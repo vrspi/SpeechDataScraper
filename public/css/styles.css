@@ -3,28 +3,89 @@
   content: "";
   display: inline-block;
 }
+*{
+    color: #E0E0E0;
+    font-family: 'DarkerGrotesque-Medium';
+
+}
+@font-face {
+    font-family: 'DarkerGrotesque-ExtraBold';
+    src: url('/fonts/DarkerGrotesque-ExtraBold.ttf') format('truetype');        
+}
+@font-face {
+    font-family: 'DarkerGrotesque-Light';
+    src: url('/fonts/DarkerGrotesque-Light.ttf') format('truetype');        
+}
+@font-face {
+    font-family: 'DarkerGrotesque-Medium';
+    src: url('/fonts/DarkerGrotesque-Medium.ttf') format('truetype');        
+}
 
 .toggle-label, .round, .recording, .mic__head::after, .mic, svg {
   position: absolute;
   top: 50%;
   left: 50%;
 }
+header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 1000; /* Ensure the header stays above other content */
+}
 
-.frame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 400px;
-  height: 400px;
-  margin-top: -200px;
-  margin-left: -200px;
-  border-radius: 2px;
-  box-shadow: 4px 8px 16px 0 rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  color: #333;
-  font-family: "Open Sans", Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 60px; /* Adjust this value to match the height of your fixed header */
+}
+
+/* Add this to ensure that the .container is centered within main, 
+   which is already flex-centered due to .container-parent */
+.container {
+    width: 100%;
+    max-width: 400px; /* Or whatever width you prefer */
+    margin: 0 auto;
+    text-align: center; /* Center the text for smaller screens or narrower containers */
+}
+
+/* This ensures that the footer is pushed to the bottom of the page */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 10px 0;
+    color: #f1f1f1;
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
+.footer-content a {
+    color: #4fa8f6;
+    text-decoration: none;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+
+/* Adjust the body's padding to avoid content being hidden behind fixed header/footer */
+body {
+    padding-top: 60px; /* Height of the header */
+    padding-bottom: 40px; /* Height of the footer */
+    margin: 0;
+    background-image: url("/css/bggg.jpg");
 }
 
 input {
@@ -38,7 +99,7 @@ svg {
   margin-left: -65px;
 }
 svg .circle-svg {
-  stroke: #000000;
+  stroke: #ffffff;
   stroke-width: 3;
   fill: transparent;
 }
@@ -54,7 +115,7 @@ svg .circle-svg {
   transition: all 0.3s ease;
 }
 .mic__head {
-  background: linear-gradient(45deg, #828282 50%, rgb(95, 95, 95) 50%);
+  background: linear-gradient(45deg, #E0E0E0 50%, white 50%);
   width: 25.5px;
   width: 30px;
   height: 63.75px;
@@ -62,20 +123,20 @@ svg .circle-svg {
 }
 .mic__head::after {
   top: 10%;
-  background: linear-gradient(45deg, #ffffff 50%, #F06292 90%);
+  background: linear-gradient(45deg, #ffaa00 50%, #f0e662 90%);
   width: 8px;
   height: 20px;
   border-radius: inherit;
   transform: translate(-50%);
 }
 .mic__neck {
-    background: linear-gradient(45deg, #828282 50%, rgb(95, 95, 95) 50%);
-    width: 4.25px;
+  background: linear-gradient(45deg, #E0E0E0 50%, white 50%);
+  width: 4.25px;
   height: 17px;
 }
 .mic__leg {
-    background: linear-gradient(45deg, #828282 50%, rgb(95, 95, 95) 50%);
-    width: 25.5px;
+  background: linear-gradient(45deg, #E0E0E0 50%, white 50%);
+  width: 25.5px;
   height: 4.25px;
   border-radius: 50px;
 }
@@ -91,8 +152,8 @@ svg .circle-svg {
 }
 
 .round {
-    background: linear-gradient(45deg, #828282 50%, rgb(95, 95, 95) 50%);
-    width: 12.75px;
+  background: white;
+  width: 12.75px;
   height: 12.75px;
   border-radius: 50%;
   margin-top: -6.375px;
@@ -172,3 +233,45 @@ svg .circle-svg {
     stroke-dashoffset: 0;
   }
 }
+
+.info-block {
+    position: relative; /* Sets the positioning context for absolute children */
+    width: 300px;
+    height: 60px; /* Adjust as needed */
+    margin-bottom: 10px; /* Spacing between blocks */
+}
+
+/* Background image styling */
+.info-background img {
+    width: 100%;
+    height: 100%;
+    display: block; /* Ensures the image takes up the full size of .info-background */
+}
+
+/* Text styling inside info blocks */
+.info-text {
+    position: absolute; /* Positions the text block absolutely within .info-block */
+    top: -12px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Aligns items vertically center */
+    overflow: hidden; /* Prevents content from overflowing */
+    font-family: 'DarkerGrotesque-ExtraBold';
+    
+}
+.info-label {
+    white-space: nowrap; /* Prevents the label from wrapping */
+    padding-left: 10px;
+    /* Add more styling as needed */
+}
+.info-label,
+.info-data {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    color: #fff; /* Adjust color */
+    margin: 0 5px; /* Adds spacing between label and data, adjust as needed */
+    font-family: 'DarkerGrotesque-Light';}

@@ -17,6 +17,9 @@ const voiceRecorderRoutes = require('./routes/voiceRecorderRoutes');
 
 // Use routes
 app.use('/VoiceRecorder', voiceRecorderRoutes);
+app.get('/privacy-policy', (req, res) => {
+    res.render('pages/privacy-policy'); // Your EJS file for the privacy policy
+});
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {
