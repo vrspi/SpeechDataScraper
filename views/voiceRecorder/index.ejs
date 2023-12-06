@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Voice Recorder</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>AI Voice Recorder</h1>
+    </header>
+    <main>
+        <div id="instructions">
+            <p>Please read the following text aloud:</p>
+            <blockquote>
+                <!-- Dynamic text to read will go here -->
+                "Example text for voice recording."
+            </blockquote>
+        </div>
+        <div id="recorder">
+            
+                <input type="checkbox" name="toggle" id="record-toggle">
+                
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50%" cy="50%" r="45" class="circle-svg" />
+                </svg>
+                
+                <div class="mic">
+                    <div class="mic__head"></div>
+                    <div class="mic__neck"></div>
+                    <div class="mic__leg"></div>
+                </div>
+                
+                <div class="recording">
+                    <div class="round"></div>
+                    <div class="round"></div>
+                    <div class="round"></div>
+                </div>
+                
+                <label for="record-toggle" class="toggle-label"></label>
+            
+        </div>
+    </main>
+    <footer>
+        <p>Record your voice for AI training</p>
+    </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
