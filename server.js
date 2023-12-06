@@ -32,6 +32,7 @@ app.post('/submit-audio', async (req, res) => {
 
 // Use routes
 app.use('/VoiceRecorder', voiceRecorderRoutes);
+app.use('/', voiceRecorderRoutes);
 app.get('/privacy-policy', (req, res) => {
     res.render('pages/privacy-policy'); // Your EJS file for the privacy policy
 });
@@ -48,7 +49,7 @@ app.use((err, req, res, next) => {
 });
 
 // Set the server to listen on a port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 module.exports = app;
