@@ -55,15 +55,42 @@ header h1 {
 }
 
 
+#next-btn {
+    position: relative; /* Ensure it's positioned in the stacking context */
+    z-index: 2000; /* Above the blur overlay */
+    /* Style your button as needed */
+}
+.glow-button {
+    position: relative;
+    z-index: 2000; /* Above the blur overlay */
+    /* Style your button as needed */
+
+    /* Glow effect */   
+    box-shadow: 0 0 15px rgba(81, 203, 238, 1); /* Adjust color and size as needed */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.glow-button:hover {
+    box-shadow: 0 0 20px rgba(81, 203, 238, 1); /* Larger glow on hover */
+}
+
+
+
+
             </style>
         </head>
         <body>
+            <!-- <div id="blur-overlay"></div> -->
+            <div id="overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 3000;">
+                <button id="start-btn" class="btn btn-primary">Start</button>
+                <button id="skip-btn" class="btn btn-secondary">Skip</button>
+            </div>
             <header>
                 <img src="/css/aiv.png" alt="Logo" class="header-logo">
                 <h1>AI Voice Recorder</h1>
             </header>
-            
-            <main class="container-parent">
+            <div class="content-wrapper">
+                  <main class="container-parent">
                 <div id="alerts-container"></div>
                 <div class="container">
                     <div id="instructions">
@@ -108,6 +135,10 @@ header h1 {
                     
     
                 </div>
+                <audio id="audio-player" src="" hidden></audio>
+
+                <button id="next-btn" class="btn btn-primary glow-button" hidden>Next</button>
+
                 <div id="audio-player-container">
                     <!-- Audio player will be inserted here -->
                 </div>
@@ -121,9 +152,18 @@ header h1 {
                     <p><a href="/privacy-policy">Privacy Policy</a></p>
                 </div>
             </footer>
+            </div>
+          
             
             <script>
               document.addEventListener('DOMContentLoaded', () => {
+
+                
+
+            // ###############################################################################################
+
+
+
                 let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
@@ -172,6 +212,8 @@ header h1 {
         try {
             const formData = new FormData();
             formData.append('audio', audioBlob);
+            let mytext = document.getElementById('line').innerText;
+            formData.append('text', mytext);
 
             const response = await fetch('/submit-audio', {
                 method: 'POST',
@@ -204,7 +246,109 @@ header h1 {
             $(alert).alert('close'); // Using jQuery if Bootstrap requires it
         }, 5000);
     }
+
+    //#################################################################################################
+
+    const items = [
+    document.querySelector('#instructions'),
+
+    document.querySelector('#instructions'),
+    document.querySelector('#instructions'),
+
+    document.querySelector('.mic'),
+    document.querySelector('.recording'),
+    
+    document.querySelector('footer'),
+
+];
+
+let currentItemIndex = 0;
+function updateHighlight() {
+    items.forEach((item, idx) => {
+        if (idx === currentItemIndex) {
+            item.classList.add('highlight-effect');
+            item.style.filter = 'none'; // Remove blur from the highlighted element
+            if(item == document.querySelector('.mic')){
+                // Create a new 'change' event
+var event = new Event('change');
+
+// Dispatch it.
+recordToggle.dispatchEvent(event);
+            }
+            if(item == document.querySelector('footer')){
+                var event = new Event('change');
+                recordToggle.dispatchEvent(event);
+            }
+        } else {
+            item.classList.remove('highlight-effect');
+            item.style.filter = 'blur(5px)'; // Apply blur to other elements
+           
+            
+        }
+    });
+}
+
+document.getElementById('next-btn').addEventListener('click', () => {
+    currentItemIndex = (currentItemIndex + 1) % items.length;
+    updateHighlight();
 });
+
+updateHighlight(); // Initialize
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////::
+const overlay = document.getElementById('overlay');
+    const audioPlayer = document.getElementById('audio-player');
+    function removeAllBlur() {
+        items.forEach(item => {
+            item.classList.remove('highlight-effect');
+            item.style.filter = 'none';
+        });
+    }
+    document.getElementById('start-btn').addEventListener('click', () => {
+        overlay.style.display = 'none'; // Hide the overlay
+        audioPlayer.src = audioFiles[currentAudioIndex];
+        audioPlayer.play().catch(e => console.error('Error playing audio:', e));
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', () => {
+        overlay.style.display = 'none'; // Hide the overlay
+        audioPlayer.pause(); // Stop any playing audio
+        currentAudioIndex = audioFiles.length; // Set to the end of the audio list
+        removeAllBlur(); // Remove blur from all elements
+    });
+    const audioFiles = [
+        '/css/salam.mp3',
+        '/css/awalan.mp3',
+        '/css/clicki l mic.mp3',
+        "/css/katqra ljomla.mp3",
+        "/css/finalisation.mp3",
+        "/css/ich3ar.mp3",
+        "/css/data.mp3",
+        // Add more paths as needed
+    ];
+    let currentAudioIndex = 0;
+
+    audioPlayer.onended = () => {
+        if (currentAudioIndex < audioFiles.length - 1) {
+        // Not the last audio, proceed to the next one
+        setTimeout(() => {
+            document.getElementById('next-btn').click();
+            currentAudioIndex++;
+            audioPlayer.src = audioFiles[currentAudioIndex];
+            audioPlayer.play().catch(e => console.error('Error playing audio:', e));
+        }, 0); // Adjust the wait time as needed
+    } else {
+        // Last audio finished, remove blur from all elements
+        items.forEach(item => {
+            item.classList.remove('highlight-effect');
+            item.style.filter = 'none';
+        });
+    }
+    };
+
+});
+
+
 
             </script>
         </body>
