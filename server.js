@@ -7,9 +7,15 @@ const fs = require('fs').promises;
 const archiver = require('archiver');
 const mysql = require('mysql');
 const fs1 = require('fs');
+const csv = require('csv-parser');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' }); // Temporarily save files to 'uploads' directory
+// In your routes file
+app.use(cookieParser());
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
@@ -91,6 +97,25 @@ app.get('/select-all', (req, res) => {
             });
         });
     });
+});
+app.get('/add-data', (req, res) => {
+    const results = [];
+
+    fs1.createReadStream('D:\\SpeechDataScraper\\public\\sentences.csv')
+        .pipe(csv())
+        .on('data', (data) => results.push(data.darija))
+        .on('end', () => {
+            // Insert data into the database
+            results.forEach(darijaText => {
+                connection.query('INSERT INTO `1` (text) VALUES (?)', [darijaText], (err, result) => {
+                    if (err) {
+                        console.error('Error inserting data:', err);
+                        return;
+                    }
+                });
+            });
+            res.send('Data inserted successfully');
+        });
 });
 // Use routes
 app.use('/VoiceRecorder', voiceRecorderRoutes);

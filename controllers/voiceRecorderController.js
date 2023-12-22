@@ -1,4 +1,6 @@
+// controllers/voiceRecorderController.js
 const db = require('../module/db');
+
 const index = async (req, res) => {
     try {
         const [rows] = await db.query("SELECT text FROM `1`");
