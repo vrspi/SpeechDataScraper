@@ -9,7 +9,7 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 
 router.get('/', isAuthenticated, voiceRecorderController.index);
 router.get('/login', (req, res) => {
-    res.render('login', { query: req.query }); // Pass query parameters to the view
+    res.render('login/Index', { query: req.query }); // Pass query parameters to the view
 });
 router.post('/login', authController.loginUser);
 // Add these routes for signup
