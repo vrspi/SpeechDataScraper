@@ -165,19 +165,23 @@ header h1 {
                 let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
-
+    let isTutorial = false;                
     const recordToggle = document.getElementById('record-toggle');
     const recordingVisuals = document.querySelector('.recording');
     const alertsContainer = document.getElementById('alerts-container');
     let stream;
     recordToggle.addEventListener('change', async () => {
         if (!isRecording) {
-            try {
+            
+
+                try {
+                    if(isTutorial == false){
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = event => {
                     audioChunks.push(event.data);
                 };
+                   
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks);
                     const audioUrl = URL.createObjectURL(audioBlob);
@@ -188,10 +192,13 @@ header h1 {
                 };
                 mediaRecorder.start();
                 isRecording = true;
+            }
                 recordingVisuals.style.opacity = 1;
             } catch (error) {
                 createAlert('Error accessing microphone: ' + error.message, 'danger');
             }
+            
+           
         } else {
             mediaRecorder.stop();
         mediaRecorder = null;
@@ -208,7 +215,8 @@ header h1 {
     
     async function sendAudioToServer(audioBlob) {
         try {
-            const formData = new FormData();
+            if(isTutorial == false){
+                const formData = new FormData();
             formData.append('audio', audioBlob);
             let mytext = document.getElementById('line').innerText;
             formData.append('text', mytext);
@@ -222,6 +230,8 @@ header h1 {
             if (data.randomText) {
                 document.getElementById('line').innerText = data.randomText;
             }
+            }
+            
         } catch (error) {
             console.error('Error sending audio:', error);
         }
@@ -330,12 +340,14 @@ const overlay = document.getElementById('overlay');
         if (currentAudioIndex < audioFiles.length - 1) {
         // Not the last audio, proceed to the next one
         setTimeout(() => {
+            isTutorial = true;
             document.getElementById('next-btn').click();
             currentAudioIndex++;
             audioPlayer.src = audioFiles[currentAudioIndex];
             audioPlayer.play().catch(e => console.error('Error playing audio:', e));
         }, 0); // Adjust the wait time as needed
     } else {
+        isTutorial = false;
         // Last audio finished, remove blur from all elements
         items.forEach(item => {
             item.classList.remove('highlight-effect');
