@@ -34,22 +34,46 @@ const connection= mysql.createPool({
     database: 'u669885128_uZsNT',
     password: 'Loulouta159'
 });
-app.post('/submit-audio', upload.single('audio'), async (req, res) => {
+const jwt = require('jsonwebtoken');
+const jwtSecret = "VRSPIANAS16091999"; 
+
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.jwt || req.headers.authorization?.split(' ')[1]; 
+
+    if (token == null) return res.sendStatus(401); 
+
+    jwt.verify(token, jwtSecret, (err, user) => {
+        if (err) return res.sendStatus(403); 
+        req.user = user;
+        next();
+    });
+};
+
+app.post('/submit-audio', authenticateToken, upload.single('audio'), async (req, res) => {
     try {
         const text = req.body.text;
         const audioFilePath = req.file.path;
+        const userId = req.user.id; // Extracted from the token
 
         // Read the audio file into a buffer
         const audioBuffer = await fs.readFile(audioFilePath);
 
-        // Insert into the database
-        const query = 'INSERT INTO audio_data (text, audio) VALUES (?, ?)';
-        connection.query(query, [text, audioBuffer], (err, results) => {
-            if (err){console.log(err)};
-            
+        // Insert into the database including the user ID
+        const query = 'INSERT INTO audio_data (text, audio, AIuserId) VALUES (?, ?, ?)';
+
+        // Using a Promise to handle the asynchronous operation
+        const insertAudioData = new Promise((resolve, reject) => {
+            connection.query(query, [text, audioBuffer, userId], (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
         });
 
-      
+        await insertAudioData;
+
         // Fetch a new random text from database
         const [rows] = await db.query("SELECT text FROM `1`");
         const randomText = rows[Math.floor(Math.random() * rows.length)].text;
@@ -60,6 +84,7 @@ app.post('/submit-audio', upload.single('audio'), async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 app.get('/select-all', (req, res) => {
     connection.query('SELECT id, audio FROM audio_data', async (err, results) => {
         if (err) {

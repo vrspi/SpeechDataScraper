@@ -46,7 +46,7 @@ const signUpUser = async (req, res) => {
         const userExists = await db.query('SELECT * FROM AIusers WHERE username = ?', [username]);
         if (userExists[0].length > 0) {
             // Username already exists, return to sign-up page with an error message
-            return res.render('signup', { 
+            return res.render('signup/Index', { 
                 error: 'Username already exists', 
                 username: username // Optionally pre-fill the username field
             });
